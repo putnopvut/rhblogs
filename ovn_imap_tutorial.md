@@ -14,17 +14,21 @@ ovn-nbctl lsp-add sw sw-p1
 ovn-nbctl lsp-set-addresses sw-p1 00:ac:00:ff:01:01 192.168.0.1
 ````
 
-It's pretty simple. But it requires you to manually keep track of IP addresses
-for the switch ports.
+To recap, the first line creates a logical switch called "sw". The second line
+adds a switch port to sw called "sw-p1". The final line sets the MAC and IP
+address of sw-p1. It's pretty simple. But it requires you to manually keep
+track of IP addresses for the switch ports. Is there a way we could create a
+switch port without having to manually add the MAC and IP addresses?
 
 If you dig a bit deeper, you can find tutorials on the web that describe how to
 set up OVN to provide IP addresses using DHCP. This saves you some configuration
-steps on the VMs, but it doesn't help any on the OVN side. This is because you
-still have to specify an IP address on the logical switch port.
+steps on the VMs, but it doesn't help any on the OVN side. You still have to
+specify an IP address on the logical switch port.
 
 But is there some way that you can actually have OVN dynamically assign
 addresses to switch ports? If you scrounge through the ovn-nb manpage, you might
-be able to piece together the way to do it, but here it is all in one tutorial!
+be able to piece together the way to do it. This tutorial seeks to clear the air
+so you can know exactly what tools are available to you and how to use them.
 
 Let's start with the relevant options you can set, and then we'll look at some
 examples that use these options. All of these are set as "other_config" on
