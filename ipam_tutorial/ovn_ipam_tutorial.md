@@ -20,6 +20,8 @@ address of sw-p1. It's pretty simple. But it requires you to manually keep
 track of IP addresses for the switch ports. Is there a way we could create a
 switch port without having to manually add the MAC and IP addresses?
 
+## Dynamic Addressing
+
 If you dig a bit deeper, you can find tutorials on the web that describe how to
 set up OVN to provide IP addresses using DHCP. This saves you some configuration
 steps on the VMs, but it doesn't help any on the OVN side. You still have to
@@ -29,6 +31,13 @@ But is there some way that you can actually have OVN dynamically assign
 addresses to switch ports? If you scrounge through the ovn-nb manpage, you might
 be able to piece together the way to do it. This tutorial seeks to clear the air
 so you can know exactly what tools are available to you and how to use them.
+
+For our demonstration, we will use a very simple logical switch that looks like
+the following:
+
+![diagram](Switch_Diagram.svg)
+
+## Switch configuration
 
 Let's start with the relevant options you can set, and then we'll look at some
 examples that use these options. All of these are set as "other_config" on
@@ -62,6 +71,8 @@ ovn-nbctl lsp-set-addresses port dynamic
 
 With way #1, you specify the MAC address, and with way #2, you allow for OVN to
 allocate the MAC address for you.
+
+## Demonstration
 
 So let's go forth with an example where we do some basic setup:
 
