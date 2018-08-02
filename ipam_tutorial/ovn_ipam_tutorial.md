@@ -32,10 +32,9 @@ addresses to switch ports? If you scrounge through the ovn-nb manpage, you might
 be able to piece together the way to do it. This tutorial seeks to clear the air
 so you can know exactly what tools are available to you and how to use them.
 
-For our demonstration, we will use a very simple logical switch that looks like
-the following:
+For our demonstration, we will use a very simple logical switch with two ports:
 
-![diagram](Switch_Diagram.svg)
+![switch-with-two-ports](images/Switch-two-ports.svg)
 
 ## Switch configuration
 
@@ -57,20 +56,22 @@ logical switches.
 
 Once you have these options set on your switch, it's then a matter of setting
 your switch ports up to make use of these options. You can do this in one of two
-ways. Way #1:
+ways.
+
+Method #1:
 
 ````
 ovn-nbctl lsp-set-addresses port 00:ac:00:ff:01:01 dynamic
 ````
 
-Way #2:
+Method #2:
 
 ````
 ovn-nbctl lsp-set-addresses port dynamic
 ```` 
 
-With way #1, you specify the MAC address, and with way #2, you allow for OVN to
-allocate the MAC address for you.
+With method #1, you specify the MAC address, and with way #2, you allow for OVN
+to allocate the MAC address for you.
 
 ## Demonstration
 
@@ -129,11 +130,15 @@ up                  : false
 
 Notice the "dynamic_addresses" for the two switch ports. This database column is
 automatically populated by ovn-northd based on IPAM configuration on the logical
-switch. For port 1, we specified "dynamic" for the addresses, so OVN created a
+switch. For port1, we specified "dynamic" for the addresses, so OVN created a
 MAC address and IP addresses for us. You can recognize OVN-allocated MAC
 addresses because they always start with "0a".
 
-Port 1 was assigned the IPv4 address 192.168.0.2, and Port 2 was assigned the
+In picture form, our switch now looks like:
+
+![dyn-switch-two-ports](images/Switch-two-ports-dyn.svg)
+
+port1 was assigned the IPv4 address 192.168.0.2, and port2 was assigned the
 address 192.168.0.3. Why does the addressing start with .2 instead of .1? OVN
 reserves the first address of a subnet for the router that the switch attaches
 to. In our case, there is no router, so no switch port was assigned 192.168.0.1.
@@ -151,25 +156,29 @@ that even though only the first 64 bits of the address are used, OVN expects a
 valid IPv6 address to be provided. Therefore, if you are providing 64 bits, be
 sure to end the address with "::" so that OVN will process it as expected.
 
+## Excluding IP addresses
+
 Let's take a closer look into the exclude\_ips option. Let's set up exclude\_ips
 and then set up additional ports to see what happens.
 
 ````
-ovn-nbctl set Logical_Switch dyn-switch other_config:exclude_ips="192.168.0.3 \
-          192.168.0.4 192.168.0.6..192.168.0.100"
+ovn-nbctl set Logical_Switch dyn-switch other_config:exclude_ips="192.168.0.4 \
+              192.168.0.6..192.168.0.100"
 ````
 
-Before continuing, let's take a closer look at the syntax. First, we specfied
-two IP addresses, 192.168.0.3 and 192.168.0.4. This means that these individual
-IP addresses should not be dynamically assigned. Then next, we specified a range
-of IP addresses using `..`. This is a lot more practical than spelling out the
-95 IP addresses from 192.168.0.6 to 192.168.0.100. The quotation marks around
-the string are necessary so that the shell does not interpret the spaces between
-addresses as separate arguments to ovn-nbctl.
+![dyn-switch-two-ports-exclude](images/Switch-two-ports-dyn-excl.svg)
 
-This may seem obvious to you, but only IPv4 addresses can be specified in
-exclude_ips. Since IPv6 addresses are derived from the port's MAC address,
-there is no point in specifying any excluded addresses.
+Before continuing, let's take a closer look at the syntax. First, we specfied
+one IP addresses, 192.168.0.4. This means that this individual IP address will
+not be dynamically assigned. Next, we specified a range of IP addresses using
+`..`. This is a lot more practical than spelling out the 95 IP addresses from
+192.168.0.6 to 192.168.0.100. The quotation marks around the string are
+necessary so that the shell does not interpret the spaces between addresses as
+separate arguments to ovn-nbctl.
+
+Only IPv4 addresses can be specified in exclude_ips. Since IPv6 addresses are
+derived from the port's MAC address, there is no point in specifying any
+excluded addresses.
 
 And now let's set up two more ports on the switch.
 
@@ -181,7 +190,7 @@ ovn-nbctl lsp-set-addresses port4 dynamic
 ````
 
 Based on the pattern we had previously seen, we might expect for port3 to have
-IP address 192.168.0.3. However, that address is in our excluded set of IP
+IP address 192.168.0.4. However, that address is in our excluded set of IP
 addresses. Let's see what port3 has been assigned:
 
 ````
@@ -228,10 +237,16 @@ up                  : false
 It got assigned 192.168.0.101 since all addresses between 192.168.0.6 and
 192.168.0.100 are in our excluded set.
 
+Here is our final logical switch:
+
+![dyn-switch-four-port](images/Switch-four-ports.svg)
+
+## What's to come
+
 With all this, you should have the tools you need to set up IP addresses on your
 logical switches without the need to keep track of assigned addresses in your
 application.
 
-But there's more to this than what I have presented here. In a follow-up
+But there's more to this than what I have presented here. In part 2 of this
 blogpost, we'll look at some of the downsides in the IPAM implementation of OVN,
-and we will delve into fixes that are coming in the upcoming version of OVN.
+and we will delve into fixes that are coming in an upcoming version of OVN.
