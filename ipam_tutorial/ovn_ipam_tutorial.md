@@ -34,7 +34,7 @@ so you can know exactly what tools are available to you and how to use them.
 
 For our demonstration, we will use a very simple logical switch with two ports:
 
-![switch-with-two-ports](images/Switch-two-ports.svg)
+![switch-with-two-ports](images/Two-port.svg)
 
 ## Switch configuration
 
@@ -136,7 +136,7 @@ addresses because they always start with "0a".
 
 In picture form, our switch now looks like:
 
-![dyn-switch-two-ports](images/Switch-two-ports-dyn.svg)
+![dyn-switch-two-ports](images/Two-port-dynamic.svg)
 
 port1 was assigned the IPv4 address 192.168.0.2, and port2 was assigned the
 address 192.168.0.3. Why does the addressing start with .2 instead of .1? OVN
@@ -166,7 +166,7 @@ ovn-nbctl set Logical_Switch dyn-switch other_config:exclude_ips="192.168.0.4 \
               192.168.0.6..192.168.0.100"
 ````
 
-![dyn-switch-two-ports-exclude](images/Switch-two-ports-dyn-excl.svg)
+![dyn-switch-two-ports-exclude](images/Two-port-dynamic-exclude.svg)
 
 Before continuing, let's take a closer look at the syntax. First, we specfied
 one IP addresses, 192.168.0.4. This means that this individual IP address will
@@ -239,7 +239,7 @@ It got assigned 192.168.0.101 since all addresses between 192.168.0.6 and
 
 Here is our final logical switch:
 
-![dyn-switch-four-port](images/Switch-four-ports.svg)
+![dyn-switch-four-port](images/Four-port-dynamic-exclude.svg)
 
 ## What's to come
 
